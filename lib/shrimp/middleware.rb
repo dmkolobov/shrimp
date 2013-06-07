@@ -1,16 +1,11 @@
 module Shrimp
   class Middleware
-    def initialize(app, options = { }, conditions = { })
+    def initialize(app)
       @app                        = app
-      @options                    = options
-      @conditions                 = conditions
-      #@options[:polling_interval] ||= 1
-      #@options[:polling_offset]   ||= 1
-      #@options[:cache_ttl]        ||= 1
-      #@options[:request_timeout]  ||= @options[:polling_interval] * 10
     end
 
     def call(env)
+      status, headers, response = @app.call(env)
     #  @request = Rack::Request.new(env)
     #  status, headers, response = @app.call(env)
     #
@@ -25,6 +20,7 @@ module Shrimp
     #    headers["Content-Length"]         = (body.respond_to?(:bytesize) ? body.bytesize : body.size).to_s
     #    headers["Content-Type"]           = "application/pdf"
     #  end
+      [status, headers, response.body]
     end
 
     private
