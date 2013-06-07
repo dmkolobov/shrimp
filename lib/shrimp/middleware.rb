@@ -15,7 +15,8 @@ module Shrimp
       if rendering_pdf? && headers['Content-Type'] =~ /text\/html|application\/xhtml\+xml/
         body = response.respond_to?(:body) ? response.body : response.join
         body = body.join if body.is_a?(Array)
-        body = Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_pdf.read
+        body = Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_pdf
+        Rails.logger.debug body
         response = [body]
 
         # Do not cache PDFs
