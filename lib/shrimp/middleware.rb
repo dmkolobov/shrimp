@@ -4,10 +4,10 @@ module Shrimp
       @app                        = app
       @options                    = options
       @conditions                 = conditions
-      @options[:polling_interval] ||= 1
-      @options[:polling_offset]   ||= 1
-      @options[:cache_ttl]        ||= 1
-      @options[:request_timeout]  ||= @options[:polling_interval] * 10
+      #@options[:polling_interval] ||= 1
+      #@options[:polling_offset]   ||= 1
+      #@options[:cache_ttl]        ||= 1
+      #@options[:request_timeout]  ||= @options[:polling_interval] * 10
     end
 
     def call(env)
