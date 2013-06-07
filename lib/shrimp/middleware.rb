@@ -14,13 +14,8 @@ module Shrimp
 
       if rendering_pdf? && headers['Content-Type'] =~ /text\/html|application\/xhtml\+xml/
 
-        outfile = Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_pdf
-
-        body = ""
-        File.open(outfile, "r+") do |file|
-          body = file.read
-          response = [body]
-        end
+        body = Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_string
+        response = [body]
 
         # Do not cache PDFs
         headers.delete('ETag')
