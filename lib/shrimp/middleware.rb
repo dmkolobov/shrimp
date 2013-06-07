@@ -13,11 +13,13 @@ module Shrimp
       status, headers, response = @app.call(env)
 
       if rendering_pdf? && headers['Content-Type'] =~ /text\/html|application\/xhtml\+xml/
-        body = response.respond_to?(:body) ? response.body : response.join
-        body = body.join if body.is_a?(Array)
-        body = Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_pdf
-        Rails.logger.debug body
-        response = [body]
+
+        outfile = Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_pdf
+
+        File.open(outfile, "r+") do |file|
+          body = file.read
+          response = [body]
+        end
 
         # Do not cache PDFs
         headers.delete('ETag')
