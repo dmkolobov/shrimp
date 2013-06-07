@@ -37,5 +37,9 @@ module Shrimp
       env['HTTP_ACCEPT'] = concat(env['HTTP_ACCEPT'], Rack::Mime.mime_type('.html'))
       env["Rack-Middleware-PDFKit"] = "true"
     end
+
+    def concat(accepts, type)
+      (accepts || '').split(',').unshift(type).compact.join(',')
+    end
   end
 end
