@@ -28,7 +28,7 @@ module Shrimp
 
     private
 
-    def rendering_pdf
+    def rendering_pdf?
       @render_pdf
     end
 
