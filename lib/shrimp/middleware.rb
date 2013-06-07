@@ -32,4 +32,5 @@ module Shrimp
     def render_as_pdf?
       !!@request.path.match(%r{\.pdf$})
     end
+  end
 end
