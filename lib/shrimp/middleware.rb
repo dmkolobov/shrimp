@@ -16,6 +16,7 @@ module Shrimp
 
         outfile = Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_pdf
 
+        body = ""
         File.open(outfile, "r+") do |file|
           body = file.read
           response = [body]
