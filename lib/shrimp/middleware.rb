@@ -12,41 +12,18 @@ module Shrimp
 
     def call(env)
       @request = Rack::Request.new(env)
+      status, headers, response = @app.call(env)
+
       if render_as_pdf? #&& headers['Content-Type'] =~ /text\/html|application\/xhtml\+xml/
-        if already_rendered? && (up_to_date?(@options[:cache_ttl]) || @options[:cache_ttl] == 0)
-          if File.size(render_to) == 0
-            File.delete(render_to)
-            remove_rendering_flag
-            return error_response
-          end
-          return ready_response if env['HTTP_X_REQUESTED_WITH']
-          file = File.open(render_to, "rb")
-          body = file.read
-          file.close
-          File.delete(render_to) if @options[:cache_ttl] == 0
-          remove_rendering_flag
-          response                  = [body]
-          headers                   = { }
-          headers["Content-Length"] = (body.respond_to?(:bytesize) ? body.bytesize : body.size).to_s
-          headers["Content-Type"]   = "application/pdf"
-          [200, headers, response]
-        else
-          if rendering_in_progress?
-            if rendering_timed_out?
-              remove_rendering_flag
-              error_response
-            else
-              reload_response(@options[:polling_interval])
-            end
-          else
-            File.delete(render_to) if already_rendered?
-            set_rendering_flag
-            fire_phantom
-            reload_response(@options[:polling_offset])
-          end
-        end
-      else
-        @app.call(env)
+        body = Phantom.new(@request.url.sub(%r{\.pdf$}, ''), @options, @request.cookies).to_pdf(render_to)
+        response = [body]
+
+        # Do not cache PDFs
+        headers.delete('ETag')
+        headers.delete('Cache-Control')
+
+        headers["Content-Length"]         = (body.respond_to?(:bytesize) ? body.bytesize : body.size).to_s
+        headers["Content-Type"]           = "application/pdf"
       end
     end
 
