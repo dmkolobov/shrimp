@@ -15,7 +15,7 @@ module Shrimp
       status, headers, response = @app.call(env)
 
       if render_as_pdf? #&& headers['Content-Type'] =~ /text\/html|application\/xhtml\+xml/
-        body = Phantom.new(@request.url.sub(%r{\.pdf$}, ''), @options, @request.cookies).to_pdf(render_to)
+        body = Phantom.new(@request.url.sub(%r{\.pdf$}, ''), @options, @request.cookies).to_pdf
         response = [body]
 
         # Do not cache PDFs
