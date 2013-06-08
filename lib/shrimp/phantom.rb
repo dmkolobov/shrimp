@@ -108,8 +108,7 @@ module Shrimp
     end
 
     def to_pipe(path=nil)
-      @outfile = File.expand_path(path) if path
-      IO.popen "#{cmd}"
+      self.to_pdf path
     end
 
     def to_pdf!(path=nil)
