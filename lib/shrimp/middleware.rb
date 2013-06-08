@@ -2,6 +2,7 @@ module Shrimp
   class Middleware
     def initialize(app)
       @app                        = app
+      @pipe_name                  = "tmp/pipe.pdf"
     end
 
     def call(env)
@@ -14,7 +15,22 @@ module Shrimp
 
       if rendering_pdf? && headers['Content-Type'] =~ /text\/html|application\/xhtml\+xml/
 
-        body = Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_string
+        if !File.exist?( @pipe_name )
+          `mkfifo #{@pipe_name}`
+        end
+
+        Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_pipe @pipe_name
+
+        body = ""
+        next_line = ""
+        File.open @pipe_name, "r+" do |pipe|
+          while !( next_line.include? "EOF" )
+            body += next_line
+            next_line = pipe.gets
+          end
+          body += next_line
+        end
+
         response = [body]
 
         # Do not cache PDFs
