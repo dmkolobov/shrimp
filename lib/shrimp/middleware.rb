@@ -2,7 +2,6 @@ module Shrimp
   class Middleware
     def initialize(app)
       @app                        = app
-      @pipe_name                  = "tmp/pipe.pdf"
     end
 
     def call(env)
@@ -19,17 +18,21 @@ module Shrimp
           `mkfifo #{@pipe_name}`
         end
 
-        Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_pipe @pipe_name
+        pipe_name = "tmp/#{Random.new().rand * 100000}.pdf"
+
+        Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_pipe pipe_name
 
         body = ""
         next_line = ""
-        File.open( @pipe_name, "r+" ) do |pipe|
+        File.open( pipe_name, "r+" ) do |pipe|
           while !( next_line.include? "EOF" )
             body += next_line
             next_line = pipe.gets
           end
           body += next_line
         end
+
+        File.delete pipe_name
 
         response = [body]
 
