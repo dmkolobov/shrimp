@@ -31,6 +31,7 @@ module Shrimp
     # Returns the stdout output of phantomjs
     def run
       @error  = nil
+      Rails.logger.debug cmd
       @result = `#{cmd}`
       unless $?.exitstatus == 0
         @error  = @result
