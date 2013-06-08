@@ -13,12 +13,11 @@ module Shrimp
       status, headers, response = @app.call(env)
 
       if rendering_pdf? && headers['Content-Type'] =~ /text\/html|application\/xhtml\+xml/
-
-        if !File.exist?( @pipe_name )
-          `mkfifo #{@pipe_name}`
-        end
-
         pipe_name = "tmp/#{Random.new().rand * 100000}.pdf"
+
+        if !File.exist?( pipe_name )
+          `mkfifo #{pipe_name}`
+        end
 
         Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_pipe pipe_name
 
