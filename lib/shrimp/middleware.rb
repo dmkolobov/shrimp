@@ -13,7 +13,7 @@ module Shrimp
       status, headers, response = @app.call(env)
 
       if rendering_pdf? && headers['Content-Type'] =~ /text\/html|application\/xhtml\+xml/
-        pipe_name = "tmp/#{Random.new().rand * 100000}.pdf"
+        pipe_name = "tmp/#{(Random.new().rand * 100000).round}.pdf"
 
         if !File.exist?( pipe_name )
           `mkfifo #{pipe_name}`
