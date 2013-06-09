@@ -2,6 +2,7 @@ module Shrimp
   class Middleware
     def initialize(app)
       @app                        = app
+      @pipe_name                  = "tmp/pdfpipe.pdf"
     end
 
     def call(env)
@@ -13,24 +14,20 @@ module Shrimp
       status, headers, response = @app.call(env)
 
       if rendering_pdf? && headers['Content-Type'] =~ /text\/html|application\/xhtml\+xml/
-        pipe_name = "tmp/#{(Random.new().rand * 100000).round}.pdf"
-
-        if !File.exist?( File.expand_path(pipe_name) )
-          `mkfifo #{File.expand_path(pipe_name)}`
+        if !File.exist?( File.expand_path(@pipe_name) )
+          `mkfifo #{File.expand_path(@pipe_name)}`
         end
 
         body = ""
         next_line = ""
 
         phantom_pid = Process.fork do
-          Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_pipe! pipe_name
+          Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_pipe! @pipe_name
         end
 
-        body = IO.read File.expand_path(pipe_name)
+        body = IO.read File.expand_path(@pipe_name)
 
         Process.wait phantom_pid
-
-        File.delete File.expand_path(pipe_name)
 
         response = [body]
 
