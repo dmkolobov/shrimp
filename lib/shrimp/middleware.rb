@@ -21,7 +21,9 @@ module Shrimp
         end
 
 
-        Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_pipe! @pipe_name
+        rasterize_pid = Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_pipe! @pipe_name
+
+        Process.waitpid rasterize_pid
 
         Rails.logger.debug "[666] preparing to read..."
 
