@@ -32,11 +32,7 @@ module Shrimp
               body += next_line
             end
 
-            begin
-              next_line = pipe.gets
-            rescue Timeout::Error
-              "rendering still in progress..."
-            end
+            next_line = pipe.gets
           end
 
           body += next_line
