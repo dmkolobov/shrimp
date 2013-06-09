@@ -19,13 +19,13 @@ module Shrimp
           `mkfifo #{pipe_name}`
         end
 
-        Process.fork do
-          Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_pipe pipe_name
-        end
-
         body = ""
         next_line = ""
         File.open( pipe_name, "r+" ) do |pipe|
+          Process.fork do
+            Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_pipe pipe_name
+          end
+
           while !( next_line.include? "EOF" )
             body += next_line
             next_line = pipe.gets
