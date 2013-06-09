@@ -26,8 +26,11 @@ module Shrimp
           Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_pipe! pipe_name
         end
 
+        Process.wait phantom_pid
+
         File.open( File.expand_path(pipe_name), "r+" ) do |pipe|
           ready_pipe = (IO.select([pipe]))[0][0]
+
           while !(next_line.include? "EOF")
             if next_line != nil
               body += next_line
@@ -43,8 +46,6 @@ module Shrimp
 
           body += next_line
         end
-
-        Process.kill "SIGKILL", phantom_pid
 
         File.delete File.expand_path(pipe_name)
 
