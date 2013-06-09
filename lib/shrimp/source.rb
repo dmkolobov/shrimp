@@ -3,7 +3,7 @@ module Shrimp
   class Source
     def initialize(url_or_file)
       @source = url_or_file
-      raise ImproperSourceError.new unless url? || file?
+      raise ImproperSourceError.new unless url? || html? || file?
     end
 
     def url?
