@@ -14,17 +14,18 @@ module Shrimp
 
       if rendering_pdf? && headers['Content-Type'] =~ /text\/html|application\/xhtml\+xml/
         pipe_name = "tmp/#{(Random.new().rand * 100000).round}.pdf"
-        pipe_name = File.expand_path pipe_name
 
         if !File.exist?( pipe_name )
           `mkfifo #{pipe_name}`
         end
 
+        Process.fork do
+          Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_pipe pipe_name
+        end
+
         body = ""
         next_line = ""
         File.open( pipe_name, "r+" ) do |pipe|
-          Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_pipe pipe_name
-
           while !( next_line.include? "EOF" )
             body += next_line
             next_line = pipe.gets
@@ -32,6 +33,7 @@ module Shrimp
           body += next_line
         end
 
+        Process.wait
         File.delete pipe_name
 
         response = [body]
