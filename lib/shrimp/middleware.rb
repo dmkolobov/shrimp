@@ -27,12 +27,16 @@ module Shrimp
         end
 
         File.open( File.expand_path(pipe_name), "r+" ) do |pipe|
-          while !( next_line.include? "EOF" )
+          while !pipe.eof?
             if next_line != nil
               body += next_line
             end
 
-            next_line = pipe.gets
+            begin
+              next_line = pipe.gets
+            rescue Timeout::Error
+              "rendering still in progress..."
+            end
           end
           body += next_line
         end
