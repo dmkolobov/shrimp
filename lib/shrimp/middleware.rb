@@ -22,7 +22,7 @@ module Shrimp
         body = ""
         next_line = ""
 
-        Process.fork do
+        phantom_pid = Process.fork do
           Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_pipe! pipe_name
         end
 
@@ -44,7 +44,8 @@ module Shrimp
           body += next_line
         end
 
-        Process.wait
+        Process.kill "SIGKILL", phantom_pid
+
         File.delete File.expand_path(pipe_name)
 
         response = [body]
