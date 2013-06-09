@@ -107,8 +107,8 @@ module Shrimp
       File.open(self.to_pdf(path)).read
     end
 
-    def to_pipe(path=nil)
-      self.to_pdf path
+    def to_pipe!(path=nil)
+      self.to_pdf! path
     end
 
     def to_pdf!(path=nil)

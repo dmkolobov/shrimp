@@ -23,7 +23,7 @@ module Shrimp
         next_line = ""
 
         Process.fork do
-          Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_pipe pipe_name
+          Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_pipe! pipe_name
         end
 
         File.open( File.expand_path(pipe_name), "r+" ) do |pipe|
