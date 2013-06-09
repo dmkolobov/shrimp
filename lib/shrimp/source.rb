@@ -15,7 +15,7 @@ module Shrimp
     end
 
     def html?
-      !(url? || file?)
+      @source.include? "<html>"
     end
 
     def to_s
