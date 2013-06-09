@@ -26,13 +26,19 @@ module Shrimp
           Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_pipe! pipe_name
         end
 
-        Kernel.open( File.expand_path(pipe_name), "r+" ) do |pipe|
+        Kernel.open( File.expand_path(pipe_name), "r" ) do |pipe|
           while !(next_line.include? "EOF")
             if next_line != nil
               body += next_line
             end
 
-            next_line = pipe.gets
+            begin
+              next_line = pipe.read_nonblock 4
+            rescue IO::WaitReadable
+              Rails.logger.debug "IO::WaitReadable thrown. Waiting..."
+              IO.select [pipe]
+              retry
+            end
           end
 
           body += next_line
