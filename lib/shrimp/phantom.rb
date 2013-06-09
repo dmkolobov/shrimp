@@ -107,7 +107,9 @@ module Shrimp
     end
 
     def to_pipe!(path=nil)
-      self.to_pdf! path
+      @outfile = File.expand_path(path)
+      Rails.logger.debug "[666] launching phantomjs rasterize..."
+      Process.detach Process.spawn(cmd)
     end
 
     def to_pdf!(path=nil)
