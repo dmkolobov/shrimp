@@ -6,7 +6,7 @@ module Shrimp
     end
 
     def url?
-      @source.is_a?(String) && @source.match(URI::regexp)
+      !(html? || file?)
     end
 
     def file?
