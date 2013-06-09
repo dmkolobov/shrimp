@@ -36,6 +36,7 @@ module Shrimp
         @error  = @result
         @result = nil
       end
+      Rails.logger.debug "*666* #{output}"
       @result
     end
 
@@ -64,6 +65,7 @@ module Shrimp
         command = [Shrimp.configuration.phantomjs, SCRIPT_FILE, "http://www.fake.example.com", @outfile, format, zoom, margin, orientation, cookie_file, rendering_time, timeout, @source.to_s].join(" ")
         Rails.logger.debug "\n\n Printing from source: #{command}"
       end
+
       command
     end
 
@@ -83,6 +85,9 @@ module Shrimp
       @options = Shrimp.configuration.default_options.merge(options)
       @cookies = cookies
       @outfile = File.expand_path(outfile) if outfile
+
+      Rails.logger.debug "*666* Ruby Phantom Initialized! HTML: #{@source.html?}"
+
       raise NoExecutableError.new unless File.exists?(Shrimp.configuration.phantomjs)
     end
 
