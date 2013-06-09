@@ -34,7 +34,10 @@ module Shrimp
         # Do not cache PDFs
         headers["Content-Length"]         = (body.respond_to?(:bytesize) ? body.bytesize : body.size).to_s
         headers["Content-Type"]           = "application/pdf"
+      else
+        status, headers, response = @app.call(env)
       end
+
       [status, headers, response]
     end
 
