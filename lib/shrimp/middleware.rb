@@ -11,15 +11,14 @@ module Shrimp
 
       set_request_to_render_as_pdf(env) if render_as_pdf?
 
-      status, headers, response = @app.call(env)
+      status = 200
+      headers = Hash.new
+      response = []
 
-      if rendering_pdf? && headers['Content-Type'] =~ /text\/html|application\/xhtml\+xml/
+      if rendering_pdf?
         if !File.exist?( File.expand_path(@pipe_name) )
           `mkfifo #{File.expand_path(@pipe_name)}`
         end
-
-        body = ""
-        next_line = ""
 
         phantom_pid = Process.fork do
           Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_pipe! @pipe_name
@@ -27,14 +26,11 @@ module Shrimp
 
         body = IO.read File.expand_path(@pipe_name)
 
-        Process.wait phantom_pid
+        Process.waitpid 0
 
         response = [body]
 
         # Do not cache PDFs
-        headers.delete('ETag')
-        headers.delete('Cache-Control')
-
         headers["Content-Length"]         = (body.respond_to?(:bytesize) ? body.bytesize : body.size).to_s
         headers["Content-Type"]           = "application/pdf"
       end
