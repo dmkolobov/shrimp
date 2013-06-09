@@ -58,10 +58,13 @@ module Shrimp
       @outfile                          ||= "#{options[:tmpdir]}/#{Digest::MD5.hexdigest((Time.now.to_i + rand(9001)).to_s)}.pdf"
 
       if @source.url?
-        [Shrimp.configuration.phantomjs, SCRIPT_FILE, @source.to_s, @outfile, format, zoom, margin, orientation, cookie_file, rendering_time, timeout].join(" ")
+        command = [Shrimp.configuration.phantomjs, SCRIPT_FILE, @source.to_s, @outfile, format, zoom, margin, orientation, cookie_file, rendering_time, timeout].join(" ")
+        Rails.logger.debug "\n\n Printing from url: #{command}"
       elsif @source.html?
-        [Shrimp.configuration.phantomjs, SCRIPT_FILE, "http://www.fake.example.com", @outfile, format, zoom, margin, orientation, cookie_file, rendering_time, timeout, @source.to_s].join(" ")
+        command = [Shrimp.configuration.phantomjs, SCRIPT_FILE, "http://www.fake.example.com", @outfile, format, zoom, margin, orientation, cookie_file, rendering_time, timeout, @source.to_s].join(" ")
+        Rails.logger.debug "\n\n Printing from source: #{command}"
       end
+      command
     end
 
     # Public: initializes a new Phantom Object
