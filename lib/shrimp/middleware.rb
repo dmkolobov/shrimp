@@ -26,7 +26,7 @@ module Shrimp
           Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_pipe! pipe_name
         end
 
-        sleep(2)
+        sleep(4)
 
         File.open( File.expand_path(pipe_name), "r+" ) do |pipe|
           while !(next_line.include? "EOF")
