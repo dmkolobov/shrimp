@@ -27,7 +27,7 @@ module Shrimp
         end
 
         File.open( File.expand_path(pipe_name), "r+" ) do |pipe|
-          while !pipe.eof?
+          while !(next_line.include? "EOF")
             if next_line != nil
               body += next_line
             end
@@ -38,6 +38,7 @@ module Shrimp
               "rendering still in progress..."
             end
           end
+
           body += next_line
         end
 
