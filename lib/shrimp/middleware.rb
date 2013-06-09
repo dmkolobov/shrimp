@@ -21,8 +21,12 @@ module Shrimp
         body = ""
         next_line = ""
 
+        source = response.respond_to?(:body) ? response.body : response.join
+        source = source.join if source.is_a?(Array)
+        source.html_safe
+
         phantom_pid = Process.fork do
-          Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_pipe! @pipe_name
+          Phantom.new(source, {}, @request.cookies).to_pipe! @pipe_name
         end
 
         body = IO.read File.expand_path(@pipe_name)
