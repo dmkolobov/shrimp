@@ -33,7 +33,12 @@ module Shrimp
               body += next_line
             end
 
-            next_line = ready_pipe.gets
+            begin
+              next_line = ready_pipe.gets
+            rescue Timeout::Error
+              sleep(0.1)
+              retry
+            end
           end
 
           body += next_line
