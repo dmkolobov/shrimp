@@ -86,7 +86,10 @@ module Shrimp
       @cookies = cookies
       @outfile = File.expand_path(outfile) if outfile
 
-      Rails.logger.debug "*666* Ruby Phantom Initialized! HTML: #{@source.html?}"
+      Rails.logger.debug "*666* Ruby Phantom Initialized!"
+      Rails.logger.debug "html?: #{@source.html?}"
+      Rails.logger.debug "source: #{@source.length}"
+      Rails.logger.debug "cookies: #{@cookies.inspect}"
 
       raise NoExecutableError.new unless File.exists?(Shrimp.configuration.phantomjs)
     end
