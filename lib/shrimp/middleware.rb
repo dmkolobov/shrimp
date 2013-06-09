@@ -13,19 +13,27 @@ module Shrimp
 
       status = 200
       headers = Hash.new
-      response = []
+      response = ["blank_response"]
 
       if rendering_pdf?
         if !File.exist?( File.expand_path(@pipe_name) )
           `mkfifo #{File.expand_path(@pipe_name)}`
         end
 
+        Rails.logger.debug "[666] Preparing to fork..."
         phantom_pid = Process.fork do
+          Rails.logger.debug "[666] Launching Phantom child-process..."
           Phantom.new(@request.url.sub(%r{\.pdf$}, ''), {}, @request.cookies).to_pipe! @pipe_name
         end
 
+        Rails.logger.debug "[666] Sleep for a second"
+        sleep 0.1
+        Rails.logger.debug "[666] Parent process continuing..."
+
+        Rails.logger.debug "[666] preparing to read..."
         body = IO.read File.expand_path(@pipe_name)
 
+        Rails.logger.debug "[666] waiting for Phantom to terminate"
         Process.waitpid 0
 
         response = [body]
