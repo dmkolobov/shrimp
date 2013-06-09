@@ -27,7 +27,7 @@ module Shrimp
 
         body = IO.read File.expand_path(@pipe_name)
 
-        Process.wait phantom_pid
+        #Process.wait phantom_pid
 
         response = [body]
 
