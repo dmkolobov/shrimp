@@ -23,7 +23,7 @@ module Shrimp
 
         source = response.respond_to?(:body) ? response.body : response.join
         source = source.join if source.is_a?(Array)
-        source.html_safe
+        source.gsub!("'", "\'")
 
         phantom_pid = Process.fork do
           Phantom.new(source, {}, @request.cookies).to_pipe! @pipe_name
