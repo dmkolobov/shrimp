@@ -27,18 +27,13 @@ module Shrimp
         end
 
         Kernel.open( File.expand_path(pipe_name), "r" ) do |pipe|
+          ready_pipe = (IO.select([pipe]))[0][0]
           while !(next_line.include? "EOF")
             if next_line != nil
               body += next_line
             end
 
-            begin
-              next_line = pipe.read_nonblock 4
-            rescue IO::WaitReadable
-              Rails.logger.debug "IO::WaitReadable thrown. Waiting..."
-              IO.select [pipe]
-              retry
-            end
+            next_line = ready_pipe.gets
           end
 
           body += next_line
